@@ -118,7 +118,7 @@ void AtomSpaceManager::loadFromSettings(const std::string &fname) {
         throw std::runtime_error("Cannot find file >>" + fname + "<<");
 
     fstream >> inputJson;
-
+    Timer timer;
     AtomSpacePtr atomspace;
     for (const auto &j : inputJson) {
         std::cout << "Loading Atomspace " << j["id"] << std::endl;
@@ -132,6 +132,8 @@ void AtomSpaceManager::loadFromSettings(const std::string &fname) {
         _atomIds.push_back(j["id"]);
         std::cout << "Atomspace " << j["id"] << " Loaded!" << std::endl;
     }
+
+    std::cout << "Took " << timer.elapsed() << " seconds load Atomspaces" << std::endl;
 
 }
 
