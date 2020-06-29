@@ -1,17 +1,21 @@
 //
-// Created by Xabush Semrie on 5/28/20.
+// Created by Abdulrahman Semrie on 5/28/20.
 //
 
-#include <opencog/atoms/base/Handle.h>
-#include <opencog/atoms/base/Node.h>
-#include <opencog/persist/file/fast_load.h>
 #include <stdexcept>
 #include <algorithm>
 #include <string>
+#include <regex>
 #include <fstream>
+#include <opencog/atoms/base/Handle.h>
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atoms/atom_types/NameServer.h>
+#include <opencog/persist/file/fast_load.h>
 
 #include "AtomSpaceManager.h"
 #include "Timer.h"
+
+static NameServer& namer = nameserver();
 
 AtomSpacePtr AtomSpaceManager::loadAtomSpace(const std::string &fname, const std::string &id) {
     //Check if the id exists
@@ -129,4 +133,47 @@ void AtomSpaceManager::loadFromSettings(const std::string &fname) {
         std::cout << "Atomspace " << j["id"] << " Loaded!" << std::endl;
     }
 
+}
+
+Handle AtomSpaceManager::findNode(Type type, const std::string &name, const std::string& id) {
+     AtomSpacePtr as = getAtomspace(id);
+     if(as == nullptr){
+         throw std::runtime_error("Atomspace with id " + id + " not found!");
+     }
+     Handle h = createNode(type, name);
+     return as->get_atom(h);
+}
+
+void AtomSpaceManager::findSimilarNames(const std::string &id, Type type, const std::string &name,
+                      HandleSeq &result) {
+
+    if (!namer.isNode(type)) return;
+
+    AtomSpacePtr as = getAtomspace(id);
+    if(as == nullptr){
+        throw std::runtime_error("Atomspace with id " + id + " not found!");
+    }
+    std::string patt = name + ".+$";
+    std::regex similar_regex(patt, std::regex_constants::ECMAScript | std::regex_constants::icase);
+
+    opencog::HandleSet atoms;
+    as->get_handleset_by_type(atoms, type);
+
+    for(auto& h : atoms){
+        if(result.size() == 10) break;
+
+        if(std::regex_search(h->get_name(), similar_regex)){
+            result.push_back(h);
+        }
+
+    }
+
+    //TODO why isn't this working???
+//    atoms.erase(std::remove_if(atoms.begin(), atoms.end(), [&similar_regex](const opencog::Handle& h) {
+//        return std::regex_search(h->get_name(), similar_regex);
+//    }), atoms.end());
+//
+//    std::transform(atoms.begin(), atoms.end(), result.begin(), [](const opencog::Handle& h) {
+//        return h->get_name();
+//    });
 }

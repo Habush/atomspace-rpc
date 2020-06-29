@@ -22,9 +22,20 @@ message AtomMsg {
   }
 }
 
+message AtomRequest {
+  string atomspace = 1;
+  AtomMsg atom = 2;
+}
+
 service AtomServer {
 
   //Returns pattern matcher execution result
   rpc ExecutePattern(PatternMsg) returns (stream AtomMsg);
 
+  //Check if a node exists on a remote atomspace. Return the done if it does
+  //Return NOT_FOUND status if it is not found
+  rpc CheckNode(AtomRequest) returns (NodeMsg);
+
+  //Find nodes with similar names to a given node. Currently it uses a simple regex and limits the result to 10
+  rpc FindSimilar(AtomRequest) returns (stream NodeMsg);
 }

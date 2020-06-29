@@ -1,10 +1,10 @@
 //
-// Created by Xabush Semrie on 6/25/20.
+// Created by Abdulrahman Semrie on 6/25/20.
 //
 
 #include "AtomServiceClient.h"
 
-void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace* as, HandleSeq&
+void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace *as, HandleSeq &
 result) {
 
     PatternMsg pattern;
@@ -32,6 +32,52 @@ result) {
         throw std::runtime_error("Executing pattern failed. Reason: " + status.error_message());
     }
 
+}
+
+Handle AtomServiceClient::CheckNode(const std::string &atom_id, Type type, const std::string
+&node_name) {
+
+    ClientContext context;
+    NodeMsg nodeMsg;
+    nodeMsg.set_type(type);
+    nodeMsg.set_name(node_name);
+
+    NodeMsg response;
+    AtomRequest req;
+    req.set_atomspace(atom_id);
+    req.mutable_atom()->mutable_node()->CopyFrom(nodeMsg);
+    Status status = _stub->CheckNode(&context, req, &response);
+    if (status.ok()) {
+        return FromNodeMsg(response);
+    } else if (status.error_code() == StatusCode::NOT_FOUND) {
+        return Handle::UNDEFINED;
+    } else {
+        throw std::runtime_error("Executing pattern failed. Reason: " + status.error_message());
+    }
+}
+
+void AtomServiceClient::FindSimilar(const std::string &atom_id, Type type, const std::string
+&node_name, HandleSeq& result, AtomSpace* as) {
+    ClientContext context;
+    AtomRequest req;
+    NodeMsg nodeMsg;
+
+    nodeMsg.set_type(type);
+    nodeMsg.set_name(node_name);
+    req.set_atomspace(atom_id);
+    req.mutable_atom()->mutable_node()->CopyFrom(nodeMsg);
+
+    NodeMsg resMsg;
+    std::unique_ptr<ClientReader<NodeMsg>> reader(_stub->FindSimilar(&context, req));
+
+    while(reader->Read(&resMsg)) {
+        result.push_back(as->add_atom(FromNodeMsg(resMsg)));
+    }
+
+    Status status = reader->Finish();
+    if (!status.ok()) {
+        throw std::runtime_error("Executing pattern failed. Reason: " + status.error_message());
+    }
 }
 
 Handle AtomServiceClient::FromNodeMsg(const NodeMsg &node) {

@@ -1,5 +1,5 @@
 //
-// Created by Xabush Semrie on 5/26/20.
+// Created by Abdulrahman Semrie on 5/26/20.
 //
 
 #ifndef OPENCOG_TEST_TIMER_H

@@ -1,8 +1,11 @@
 //
-// Created by Xabush Semrie on 6/25/20.
+// Created by Abdulrahman Semrie on 6/25/20.
 //
 #include <iostream>
+#include <vector>
+#include <string>
 #include <memory>
+#include <regex>
 #include <grpc/grpc.h>
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
@@ -12,9 +15,6 @@
 #include <manager/AtomSpaceManager.h>
 #include <opencog/guile/SchemePrimitive.h>
 #include <boost/program_options.hpp>
-#include <memory>
-#include <vector>
-#include <string>
 
 #include "atom_server.grpc.pb.h"
 
@@ -25,6 +25,7 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
+using grpc::StatusCode;
 
 using namespace opencog;
 using json = nlohmann::json;
@@ -56,6 +57,46 @@ public:
             std::cout << "Error: " << err.what() << std::endl;
             return Status(grpc::StatusCode::CANCELLED, err.what());
         }
+    }
+
+    Status CheckNode(ServerContext *context, const AtomRequest *req, NodeMsg *res) override {
+        try {
+            if(!req->atom().has_node()){
+                throw std::runtime_error("Expecting a Node message");
+            }
+            Handle h = _atomManager.findNode(req->atom().node().type(), req->atom().node().name(), req->atomspace());
+            if(h == Handle::UNDEFINED){
+                return Status(grpc::StatusCode::NOT_FOUND, "Node not found");
+            }
+
+            res->CopyFrom(buildNodeMsg(h));
+            return Status::OK;
+        } catch(std::runtime_error& err) {
+            std::cout << "Error: " << err.what() << std::endl;
+            return Status(grpc::StatusCode::CANCELLED, err.what());
+        }
+    }
+
+    Status FindSimilar(ServerContext *context, const AtomRequest *req, ServerWriter<NodeMsg> *writer) override {
+        try {
+            if(!req->atom().has_node()){
+                throw std::runtime_error("Expecting a Node message");
+            }
+        } catch(std::runtime_error& err) {
+            std::cout << "Error: " << err.what() << std::endl;
+            return Status(StatusCode::CANCELLED, err.what());
+        }
+
+        HandleSeq result;
+        Type type = req->atom().node().type();
+        const std::string& name = req->atom().node().name();
+        _atomManager.findSimilarNames(req->atomspace(), type, name, result);
+
+        for(auto &h : result) {
+            writer->Write(buildNodeMsg(h));
+        }
+
+        return Status::OK;
     }
 
 private:

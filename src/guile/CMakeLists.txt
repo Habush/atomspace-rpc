@@ -20,5 +20,5 @@ ADD_GUILE_MODULE(FILES
 
 WRITE_GUILE_CONFIG(${GUILE_BIN_DIR}/opencog/atom-service-config.scm SCM_CONFIG TRUE)
 WRITE_GUILE_CONFIG(${GUILE_BIN_DIR}/opencog/atom-service-config-installable.scm SCM_CONFIG FALSE)
-INSTALL(FILES ${GUILE_BIN_DIR}/opencog/atom-service-config-installable.scm DESTINATION ${GUILE_SITE_DIR}/opencog RENAME
+install(FILES ${GUILE_BIN_DIR}/opencog/atom-service-config-installable.scm DESTINATION ${GUILE_SITE_DIR}/opencog RENAME
         atom-service-config.scm)

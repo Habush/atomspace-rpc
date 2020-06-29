@@ -1,5 +1,5 @@
 //
-// Created by Xabush Semrie on 6/26/20.
+// Created by Abdulrahman Semrie on 6/26/20.
 //
 
 #include <cstdlib>
@@ -14,7 +14,15 @@ using namespace opencog;
 class AtomServiceSCM : public ModuleWrap {
 public:
     AtomServiceSCM(void);
+
     HandleSeq ExecutePattern(const std::string &atom_id, const Handle &patt);
+
+    bool CheckNode(const std::string &atom_id, Type type, const std::string
+    &node_name);
+
+    HandleSeq FindSimilar(const std::string &atom_id, Type type, const std::string
+    &node_name);
+
 private:
     void init(void);
 
@@ -59,9 +67,33 @@ HandleSeq AtomServiceSCM::ExecutePattern(const std::string &atom_id, const Handl
 
 }
 
+bool AtomServiceSCM::CheckNode(const std::string &atom_id, Type type, const std::string
+&node_name) {
+    AtomServiceClient client(_channel);
+    Handle h = client.CheckNode(atom_id, type, node_name);
+
+    return h != Handle::UNDEFINED;
+}
+
+HandleSeq AtomServiceSCM::FindSimilar(const std::string &atom_id, Type type, const std::string
+&node_name) {
+    AtomSpace* as = SchemeSmob::ss_get_env_as("exec-pattern");
+    AtomServiceClient client(_channel);
+    HandleSeq res;
+    client.FindSimilar(atom_id, type, node_name, res, as);
+
+    return res;
+}
+
 void AtomServiceSCM::init(void) {
     define_scheme_primitive("exec-pattern",
             &AtomServiceSCM::ExecutePattern, this, "atom-service");
+
+    define_scheme_primitive("check-node",
+            &AtomServiceSCM::CheckNode, this, "atom-service");
+
+    define_scheme_primitive("find-similar-node",
+                            &AtomServiceSCM::FindSimilar, this, "atom-service");
 }
 
 void opencog_atom_service_init(void) {
