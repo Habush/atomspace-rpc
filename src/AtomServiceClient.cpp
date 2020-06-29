@@ -1,0 +1,52 @@
+//
+// Created by Xabush Semrie on 6/25/20.
+//
+
+#include "AtomServiceClient.h"
+
+void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace* as, HandleSeq&
+result) {
+
+    PatternMsg pattern;
+    ClientContext context;
+    AtomMsg atomMsg;
+
+    pattern.set_atomspace(atom_id);
+    pattern.set_query(patt->to_string());
+
+    std::unique_ptr<ClientReader<AtomMsg>> reader(_stub->ExecutePattern(&context, pattern));
+
+
+    while (reader->Read(&atomMsg)) {
+        Handle h;
+        if (atomMsg.has_link()) {
+            h = FromLinkMsg(atomMsg.link());
+        } else {
+            h = FromNodeMsg(atomMsg.node());
+        }
+        result.push_back(as->add_atom(h));
+    }
+
+    Status status = reader->Finish();
+    if (!status.ok()) {
+        throw std::runtime_error("Executing pattern failed. Reason: " + status.error_message());
+    }
+
+}
+
+Handle AtomServiceClient::FromNodeMsg(const NodeMsg &node) {
+    return createNode((Type) node.type(), std::move(node.name()));
+}
+
+Handle AtomServiceClient::FromLinkMsg(const LinkMsg &link) {
+    HandleSeq outgoing;
+    for (auto &atom: link.outgoing()) {
+        if (atom.has_node()) {
+            outgoing.push_back(FromNodeMsg(atom.node()));
+        } else {
+            outgoing.push_back(FromLinkMsg(atom.link()));
+        }
+    }
+
+    return createLink(std::move(outgoing), (Type) link.type());
+}

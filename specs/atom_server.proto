@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+message PatternMsg {
+  string atomspace = 1;
+  string query = 2;
+}
+
+message NodeMsg {
+  uint32 type = 1;
+  string name = 2;
+}
+
+message LinkMsg {
+  uint32 type = 1;
+  repeated AtomMsg outgoing = 2;
+}
+
+message AtomMsg {
+  oneof atom {
+    LinkMsg link = 1;
+    NodeMsg node = 2;
+  }
+}
+
+service AtomServer {
+
+  //Returns pattern matcher execution result
+  rpc ExecutePattern(PatternMsg) returns (stream AtomMsg);
+
+}
