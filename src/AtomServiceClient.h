@@ -16,7 +16,6 @@
 #include <opencog/atoms/atom_types/NameServer.h>
 #include <opencog/bioscience/types/atom_types.h>
 #include <opencog/atomspace/AtomSpace.h>
-#include <libguile.h>
 
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>

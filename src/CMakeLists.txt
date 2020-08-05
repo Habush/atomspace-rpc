@@ -63,13 +63,14 @@ ENDIF()
 
 install(TARGETS atom_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-add_library(atom_service_client SHARED AtomServiceClient.cpp)
-
-target_sources(atom_service_client PRIVATE manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
+add_library(atom_service_client SHARED
+        AtomServiceClient.cpp
+        manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
 
 target_link_libraries(atom_service_client
         ${COGUTIL_LIBRARIES}
         ${ATOMSPACE_LIBRARIES}
+        ${Boost_LIBRARIES}
         ${GUILE_LIBRARIES}
         protobuf::libprotobuf
         gRPC::grpc++_unsecure)

@@ -38,7 +38,7 @@ extern "C" {
 #include <opencog/guile/SchemePrimitive.h>
 
 AtomServiceSCM::AtomServiceSCM(void)
-        :ModuleWrap("opencog atom-service")
+        :ModuleWrap("opencog grpc")
 {
     static bool is_init = false;
     if (is_init) return;
@@ -87,13 +87,13 @@ HandleSeq AtomServiceSCM::FindSimilar(const std::string &atom_id, Type type, con
 
 void AtomServiceSCM::init(void) {
     define_scheme_primitive("exec-pattern",
-            &AtomServiceSCM::ExecutePattern, this, "atom-service");
+            &AtomServiceSCM::ExecutePattern, this, "grpc");
 
     define_scheme_primitive("check-node",
-            &AtomServiceSCM::CheckNode, this, "atom-service");
+            &AtomServiceSCM::CheckNode, this, "grpc");
 
     define_scheme_primitive("find-similar-node",
-                            &AtomServiceSCM::FindSimilar, this, "atom-service");
+                            &AtomServiceSCM::FindSimilar, this, "grpc");
 }
 
 void opencog_atom_service_init(void) {
