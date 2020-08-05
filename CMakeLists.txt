@@ -38,7 +38,7 @@ ENDIF (COGUTIL_FOUND)
 
 # add the 'cmake' directory from cogutil to search path
 list(APPEND CMAKE_MODULE_PATH  ${COGUTIL_DATA_DIR}/cmake)
-message(STATUS "MODULE PATH ${CMAKE_MODULE_PATH}")
+
 #atomspace
 find_package(AtomSpace 5.0.3 CONFIG REQUIRED)
 IF(ATOMSPACE_FOUND)

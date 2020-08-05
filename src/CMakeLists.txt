@@ -1,10 +1,10 @@
 #Protobuff
 set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(protobuf REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${protobuf_VERSION}")
 
 # gRPC
-find_package(gRPC REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 #gRPC C++ plugin

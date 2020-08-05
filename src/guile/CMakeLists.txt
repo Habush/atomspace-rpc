@@ -18,6 +18,7 @@ ADD_GUILE_MODULE(FILES
         )
 
 WRITE_GUILE_CONFIG(${GUILE_BIN_DIR}/opencog/grpc-config.scm SCM_CONFIG TRUE)
+
 WRITE_GUILE_CONFIG(${GUILE_BIN_DIR}/opencog/grpc-config-installable.scm SCM_CONFIG FALSE)
 install(FILES ${GUILE_BIN_DIR}/opencog/grpc-config-installable.scm DESTINATION ${GUILE_SITE_DIR}/opencog RENAME
         grpc-config.scm)

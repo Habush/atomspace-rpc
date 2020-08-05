@@ -45,10 +45,8 @@ AtomServiceSCM::AtomServiceSCM(void)
     is_init = true;
     //if the ATOM_SERVER env variable is defined use that
     if(const char* atom_env = std::getenv("ATOM_SERVER")) {
-        std::cout << "Using " << atom_env << " as server address" << std::endl;
         _channel = grpc::CreateChannel(atom_env, grpc::InsecureChannelCredentials());
     } else {
-        std::cout << "Using localhost:50051 as server address" << std::endl;
         _channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
     }
 
