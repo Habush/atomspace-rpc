@@ -1,5 +1,5 @@
 #Protobuff
-set(protobuf_MODULE_COMPATIBLE TRUE)
+set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "")
 find_package(protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${protobuf_VERSION}")
 
