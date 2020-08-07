@@ -1,3 +1,9 @@
+#Bioscience
+find_library(BIOSCIENCE_LIB
+        NAME libbioscience-types.dylib libbioscience-types.so
+        PATHS ${CMAKE_INSTALL_PREFIX}/lib/opencog
+        NO_DEFAULT_PATH)
+
 #Protobuff
 set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "")
 find_package(protobuf CONFIG REQUIRED)
@@ -36,10 +42,9 @@ set(SOURCES manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
 add_executable(atom_server AtomspaceService.cpp)
 target_sources(atom_server PRIVATE ${SOURCES})
 
-find_library(BIOSCIENCE_LIB
-        NAME libbioscience-types.dylib libbioscience-types.so
-        PATHS ${CMAKE_INSTALL_PREFIX}/lib/opencog
-        NO_DEFAULT_PATH)
+add_library(atom_service_client SHARED
+        AtomServiceClient.cpp
+        manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
 
 # Set default include paths.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
@@ -56,17 +61,6 @@ target_link_libraries(atom_server
         gRPC::grpc++_unsecure)
 
 
-IF(BIOSCIENCE_LIB)
-    message(STATUS "AGI-Bio found.")
-    target_link_libraries(atom_server ${BIOSCIENCE_LIB})
-ENDIF()
-
-install(TARGETS atom_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-
-add_library(atom_service_client SHARED
-        AtomServiceClient.cpp
-        manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
-
 target_link_libraries(atom_service_client
         ${COGUTIL_LIBRARIES}
         ${ATOMSPACE_LIBRARIES}
@@ -76,8 +70,14 @@ target_link_libraries(atom_service_client
         gRPC::grpc++_unsecure)
 
 IF(BIOSCIENCE_LIB)
+    message(STATUS "AGI-Bio found.")
+    ADD_DEFINITIONS(-DHAVE_BIOSCIENCE)
+    target_link_libraries(atom_server ${BIOSCIENCE_LIB})
     target_link_libraries(atom_service_client ${BIOSCIENCE_LIB})
+
 ENDIF()
+
+install(TARGETS atom_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 install(TARGETS atom_service_client
         DESTINATION "lib${LIB_DIR_SUFFIX}/opencog")
