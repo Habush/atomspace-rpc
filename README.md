@@ -1,4 +1,4 @@
-#atomspace-rpc
+# atomspace-rpc
 
 This project uses [grpc](https://grpc.io) for executing pattern matching searches on a remote [AtomSpace](https://github.com/opencog). 
 
@@ -25,15 +25,18 @@ $ atom_server --config /path/to/setting.json
 
 By default the server runs at `localhost:50051` . But you can that using the `--host` and `--port` arguments.
 
-###Building and Installation.
+### Building and Installation.
 
 #### 1. Requirements:
 
 This project depends on the following libraries:
  - [AtomSpace](https://github.com/opencog/atomspace)
  - [Boost](https://www.boost.org/)
+   * On Debian you can use  `apt-get install libboost-dev`
  - [gRPC C++](https://github.com/grpc/grpc/tree/master/src/cpp)
+    * See also here - https://grpc.io/docs/languages/cpp/quickstart/
  - [nlohmann_json](https://github.com/nlohmann/json)
+    * Since nlohmann json is a header only library just copy [json.hpp](https://github.com/nlohmann/json/blob/develop/include/nlohmann/json.hpp) to `/usr/local/include/nlohmann` directory. Create the nlohmann sub directory if it doesn't exist
  - [agi-bio](https://github.com/opencog/agi-bio) - this is OPTIONAL and will be required if you are working with
        bio related atomspace
  
