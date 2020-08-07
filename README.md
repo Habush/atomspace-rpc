@@ -33,6 +33,7 @@ This project depends on the following libraries:
  - [AtomSpace](https://github.com/opencog/atomspace)
  - [Boost](https://www.boost.org/)
    * On Debian you can use  `apt-get install libboost-dev`
+ - [Protobuff](https://github.com/protocolbuffers/protobuf)
  - [gRPC C++](https://github.com/grpc/grpc/tree/master/src/cpp)
     * See also here - https://grpc.io/docs/languages/cpp/quickstart/
  - [nlohmann_json](https://github.com/nlohmann/json)
