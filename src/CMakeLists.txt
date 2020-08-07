@@ -14,7 +14,7 @@ find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 #gRPC C++ plugin
-get_target_property(gRPC_CPP_PLUGIN_EXECUTABLE gRPC::grpc_cpp_plugin IMPORTED_LOCATION_RELEASE)
+find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
 
 #Proto file
 get_filename_component(atom_proto "../specs/atom_server.proto" ABSOLUTE)

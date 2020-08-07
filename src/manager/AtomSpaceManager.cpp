@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <regex>
-#include <openccog/atoms/base/Handle.h>
+#include <opencog/atoms/base/Handle.h>
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atoms/atom_types/NameServer.h>
 #include <opencog/persist/file/fast_load.h>
