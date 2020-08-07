@@ -71,7 +71,8 @@ target_link_libraries(atom_service_client
 
 IF(BIOSCIENCE_LIB)
     message(STATUS "AGI-Bio found.")
-    ADD_DEFINITIONS(-DHAVE_BIOSCIENCE)
+    add_definitions(-DHAVE_BIOSCIENCE)
+    set(HAVE_BIOSCIENCE 1)
     target_link_libraries(atom_server ${BIOSCIENCE_LIB})
     target_link_libraries(atom_service_client ${BIOSCIENCE_LIB})
 
