@@ -1,3 +1,4 @@
+include(OpenCogGccOptions)
 #Bioscience
 find_library(BIOSCIENCE_LIB
         NAME libbioscience-types.dylib libbioscience-types.so
@@ -73,8 +74,12 @@ IF(BIOSCIENCE_LIB)
     message(STATUS "AGI-Bio found.")
     add_definitions(-DHAVE_BIOSCIENCE)
     set(HAVE_BIOSCIENCE 1)
-    target_link_libraries(atom_server ${BIOSCIENCE_LIB})
-    target_link_libraries(atom_service_client ${BIOSCIENCE_LIB})
+    target_link_libraries(atom_server
+            ${NO_AS_NEEDED}
+            ${BIOSCIENCE_LIB})
+    target_link_libraries(atom_service_client
+            ${NO_AS_NEEDED}
+            ${BIOSCIENCE_LIB})
 
 ENDIF()
 
