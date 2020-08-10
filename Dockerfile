@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 MAINTAINER Abdulrahman Semrie<hsamireh@gmail.com>
 
 #Run apt-get in NONINTERACTIVE mode
@@ -8,10 +8,16 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
 
-RUN apt-get install -y git cmake libboost-all-dev cython dh-autoreconf unzip gdb vim wget
+RUN apt-get install -y git libboost-all-dev cython dh-autoreconf unzip gdb vim wget curl libssl-dev 
 
 #Install Guile dependecies
 RUN apt-get install -y libgmp-dev libltdl-dev libunistring-dev libffi-dev libgc-dev flex texinfo  libreadline-dev pkg-config
+
+##Install latest cmake
+RUN cd /tmp && wget -O cmake.sh https://github.com/Kitware/CMake/releases/download/v3.18.1/cmake-3.18.1-Linux-x86_64.sh && \
+    sh ./cmake.sh --prefix=/usr/local --skip-license
+
+RUN cmake --version
 
 #Install guile-3.x
 RUN cd /tmp && wget https://ftp.gnu.org/gnu/guile/guile-3.0.2.tar.gz  && \
@@ -49,23 +55,16 @@ RUN cd /tmp && git clone https://github.com/opencog/agi-bio.git && \
     make install && \
     ldconfig /usr/local/lib/opencog
 
-##Install protobuf
-RUN cd /tmp && \
-    wget -O protobuf-4.0.tar.gz https://github.com/protocolbuffers/protobuf/releases/download/v4.0.0-rc2/protobuf-all-4.0.0-rc-2.tar.gz && \
-    tar -xvzf protobuf-4.0.tar.gz && cd protobuf-4.0.0-rc-2 && \
-    ./configure && make && make install && \
-    ldconfig
 
 ##Install grpc cpp
-
 RUN cd /tmp &&  git clone -b v1.31.0 https://github.com/grpc/grpc && \
     cd grpc && git submodule update --init && \
     mkdir build && cd build && \
-    cmake .. && make -j4 && make install && \
+    cmake .. && make && make install && \
     ldconfig
 
 ##Install nlohmann json
-RUN mkdir -p /usr/local/lib/nlohmann && wget -O /usr/local/lib/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
+RUN mkdir -p /usr/local/include/nlohmann && wget -O /usr/local/include/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
 
 ##Build atomspace-rpc
 COPY . /opt/atomspace-rpc
