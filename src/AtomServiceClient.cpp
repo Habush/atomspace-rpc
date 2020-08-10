@@ -10,7 +10,6 @@ result) {
     PatternMsg pattern;
     ClientContext context;
     AtomMsg atomMsg;
-
     pattern.set_atomspace(atom_id);
     pattern.set_query(patt->to_string());
 

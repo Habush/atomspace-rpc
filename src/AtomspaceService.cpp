@@ -137,6 +137,7 @@ void RunServer(const std::string &fname, const std::string &addr) {
     std::string server_address(addr);
 
     ServerBuilder  builder;
+    builder.SetDefaultCompressionAlgorithm(GRPC_COMPRESS_GZIP);
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     std::unique_ptr<Server> server(builder.BuildAndStart());

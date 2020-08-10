@@ -44,10 +44,12 @@ AtomServiceSCM::AtomServiceSCM(void)
     if (is_init) return;
     is_init = true;
     //if the ATOM_SERVER env variable is defined use that
+    grpc::ChannelArguments args;
+    args.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
     if(const char* atom_env = std::getenv("ATOM_SERVER")) {
-        _channel = grpc::CreateChannel(atom_env, grpc::InsecureChannelCredentials());
+        _channel = grpc::CreateCustomChannel(atom_env, grpc::InsecureChannelCredentials(), args);
     } else {
-        _channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
+        _channel = grpc::CreateCustomChannel("localhost:50051", grpc::InsecureChannelCredentials(), args);
     }
 
     module_init();
