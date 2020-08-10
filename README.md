@@ -62,7 +62,7 @@ Once you have started the `atom_server`, run Guile REPL and execute the followin
 A. To execute a pattern matching query
 
 ```scheme
-scheme@(guile-user)> (use-modules (opencog atom-service))
+scheme@(guile-user)> (use-modules (opencog grpc))
 scheme@(guile-user)> (exec-pattern "prod-atom" (Get  (Member (Gene "IGF1") (Variable "$pway"))))
 ```
 
