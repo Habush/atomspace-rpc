@@ -37,7 +37,9 @@ This project depends on the following libraries:
  - [gRPC C++](https://github.com/grpc/grpc/tree/master/src/cpp)
     * See also here - https://grpc.io/docs/languages/cpp/quickstart/
  - [nlohmann_json](https://github.com/nlohmann/json)
-    * Since nlohmann json is a header only library just copy [json.hpp](https://github.com/nlohmann/json/blob/develop/include/nlohmann/json.hpp) to `/usr/local/include/nlohmann` directory. Create the nlohmann sub directory if it doesn't exist
+    * Since nlohmann json is a header only library just copy [json.hpp](https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp) to `/usr/local/include/nlohmann` directory. Create the nlohmann sub directory if it doesn't exist. Run the following command:
+    
+        `$ mkdir -p /usr/local/lib/nlohmann && wget -O /usr/local/lib/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp`
  - [agi-bio](https://github.com/opencog/agi-bio) - this is OPTIONAL and will be required if you are working with
        bio related atomspace
  
