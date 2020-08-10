@@ -69,12 +69,11 @@ RUN mkdir -p /usr/local/lib/nlohmann && wget -O /usr/local/lib/nlohmann/json.hpp
 
 ##Build atomspace-rpc
 COPY . /opt/atomspace-rpc
+WORKDIR /opt/atomspace-rpc
 
-RUN mkdir -p /opt/atomspace-rpc/build && cd build && \
+RUN mkdir build && cd build && \
     cmake .. && make -j2 && make install && \
     ldconfig
 
 WORKDIR /opt/atomspace-rpc
-
-
 ENTRYPOINT ["/usr/local/bin/atom_server --config /opt/settings.json --host 0.0.0.0"]
