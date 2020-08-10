@@ -65,12 +65,12 @@ RUN cd /tmp &&  git clone -b v1.31.0 https://github.com/grpc/grpc && \
     ldconfig
 
 ##Install nlohmann json
-RUN mkdir -P /usr/local/lib/nlohmann && wget -P /usr/local/lib/nlohmann -O json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
+RUN mkdir -p /usr/local/lib/nlohmann && wget -O /usr/local/lib/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
 
 ##Build atomspace-rpc
-COPY . /opt
+COPY . /opt/atomspace-rpc
 
-RUN mkdir -P /opt/atomspace-rpc/build && cd build && \
+RUN mkdir -p /opt/atomspace-rpc/build && cd build && \
     cmake .. && make -j2 && make install && \
     ldconfig
 
