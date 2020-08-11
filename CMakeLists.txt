@@ -50,6 +50,7 @@ ELSE (ATOMSPACE_FOUND)
 ENDIF (ATOMSPACE_FOUND)
 
 include(OpenCogFindGuile)
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(src)
 
