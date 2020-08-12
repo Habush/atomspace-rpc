@@ -39,7 +39,11 @@ This project depends on the following libraries:
  - [nlohmann_json](https://github.com/nlohmann/json)
     * Since nlohmann json is a header only library just copy [json.hpp](https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp) to `/usr/local/include/nlohmann` directory. Create the nlohmann sub directory if it doesn't exist. Run the following command:
     
-        `$ mkdir -p /usr/local/lib/nlohmann && wget -O /usr/local/lib/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp`
+        ```
+      $ mkdir -p /usr/local/include/nlohmann && \
+        
+        wget -O /usr/local/include/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
+      ```
  - [agi-bio](https://github.com/opencog/agi-bio) - this is OPTIONAL and will be required if you are working with
        bio related atomspace
  
