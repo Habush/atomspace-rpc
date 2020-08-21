@@ -44,7 +44,7 @@ void AtomSpaceManagerUTest::test_execute_pattern()
 {
     logger().info("BEGIN TEST: %s", __FUNCTION__);
 
-    std::string_view patt = "(MeetLink\n"
+    std::string patt = "(MeetLink\n"
                             "   (EvaluationLink (Predicate \"is_part\")\n"
                             "    (List\n"
                             "      (Concept \"A\")\n"
@@ -52,9 +52,9 @@ void AtomSpaceManagerUTest::test_execute_pattern()
 
     auto result = _atomSpaceManager.executePattern("asp1", patt);
 
-    logger().info("Result size: %d", result.size());
+    logger().info("Result size: %d", result->getOutgoingSet().size());
 
-    TS_ASSERT_EQUALS(result.size(), 3)
+    TS_ASSERT_EQUALS(result->getOutgoingSet().size(), 3)
 
     logger().info("END TEST: %s", __FUNCTION__);
 }

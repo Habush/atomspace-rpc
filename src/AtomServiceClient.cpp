@@ -1,7 +1,7 @@
 //
 // Created by Abdulrahman Semrie on 6/25/20.
 //
-
+#include <opencog/atoms/atom_types/NameServer.h>
 #include "AtomServiceClient.h"
 
 void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace *as, HandleSeq &
@@ -33,12 +33,12 @@ result) {
 
 }
 
-Handle AtomServiceClient::CheckNode(const std::string &atom_id, Type type, const std::string
+Handle AtomServiceClient::CheckNode(const std::string &atom_id, const std::string &type_name, const std::string
 &node_name) {
 
     ClientContext context;
     NodeMsg nodeMsg;
-    nodeMsg.set_type(type);
+    nodeMsg.set_type(type_name);
     nodeMsg.set_name(node_name);
 
     NodeMsg response;
@@ -55,13 +55,13 @@ Handle AtomServiceClient::CheckNode(const std::string &atom_id, Type type, const
     }
 }
 
-void AtomServiceClient::FindSimilar(const std::string &atom_id, Type type, const std::string
+void AtomServiceClient::FindSimilar(const std::string &atom_id, const std::string &type_name, const std::string
 &node_name, HandleSeq& result, AtomSpace* as) {
     ClientContext context;
     AtomRequest req;
     NodeMsg nodeMsg;
 
-    nodeMsg.set_type(type);
+    nodeMsg.set_type(type_name);
     nodeMsg.set_name(node_name);
     req.set_atomspace(atom_id);
     req.mutable_atom()->mutable_node()->CopyFrom(nodeMsg);
@@ -80,7 +80,8 @@ void AtomServiceClient::FindSimilar(const std::string &atom_id, Type type, const
 }
 
 Handle AtomServiceClient::FromNodeMsg(const NodeMsg &node) {
-    return createNode((Type) node.type(), std::move(node.name()));
+    Type type = nameserver().getType(node.type());
+    return createNode(type, std::move(node.name()));
 }
 
 Handle AtomServiceClient::FromLinkMsg(const LinkMsg &link) {
@@ -92,6 +93,6 @@ Handle AtomServiceClient::FromLinkMsg(const LinkMsg &link) {
             outgoing.push_back(FromLinkMsg(atom.link()));
         }
     }
-
-    return createLink(std::move(outgoing), (Type) link.type());
+    Type type = nameserver().getType(link.type());
+    return createLink(std::move(outgoing), type);
 }

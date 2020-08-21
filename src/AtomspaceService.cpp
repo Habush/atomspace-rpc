@@ -88,9 +88,7 @@ public:
         }
 
         HandleSeq result;
-        Type type = req->atom().node().type();
-        const std::string& name = req->atom().node().name();
-        _atomManager.findSimilarNames(req->atomspace(), type, name, result);
+        _atomManager.findSimilarNames(req->atomspace(), req->atom().node().type(), req->atom().node().name(), result);
 
         for(auto &h : result) {
             writer->Write(buildNodeMsg(h));
@@ -103,14 +101,14 @@ private:
 
     NodeMsg buildNodeMsg(const Handle &h) {
         NodeMsg nodeMsg;
-        nodeMsg.set_type(h->get_type());
+        nodeMsg.set_type(nameserver().getTypeName(h->get_type()));
         nodeMsg.set_name(h->get_name());
         return nodeMsg;
     }
 
     LinkMsg buildLinkMsg(const Handle& h) {
         LinkMsg linkMsg;
-        linkMsg.set_type(h->get_type());
+        linkMsg.set_type(nameserver().getTypeName(h->get_type()));
         for(auto& out : h->getOutgoingSet()){
             AtomMsg msg;
             if(out->is_node()){

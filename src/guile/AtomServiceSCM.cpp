@@ -17,10 +17,10 @@ public:
 
     HandleSeq ExecutePattern(const std::string &atom_id, const Handle &patt);
 
-    bool CheckNode(const std::string &atom_id, Type type, const std::string
+    bool CheckNode(const std::string &atom_id, const std::string &type_name, const std::string
     &node_name);
 
-    HandleSeq FindSimilar(const std::string &atom_id, Type type, const std::string
+    HandleSeq FindSimilar(const std::string &atom_id, const std::string &type_name, const std::string
     &node_name);
 
 private:
@@ -67,20 +67,20 @@ HandleSeq AtomServiceSCM::ExecutePattern(const std::string &atom_id, const Handl
 
 }
 
-bool AtomServiceSCM::CheckNode(const std::string &atom_id, Type type, const std::string
+bool AtomServiceSCM::CheckNode(const std::string &atom_id, const std::string &type_name, const std::string
 &node_name) {
     AtomServiceClient client(_channel);
-    Handle h = client.CheckNode(atom_id, type, node_name);
+    Handle h = client.CheckNode(atom_id, type_name, node_name);
 
     return h != Handle::UNDEFINED;
 }
 
-HandleSeq AtomServiceSCM::FindSimilar(const std::string &atom_id, Type type, const std::string
+HandleSeq AtomServiceSCM::FindSimilar(const std::string &atom_id, const std::string &type_name, const std::string
 &node_name) {
     AtomSpace* as = SchemeSmob::ss_get_env_as("exec-pattern");
     AtomServiceClient client(_channel);
     HandleSeq res;
-    client.FindSimilar(atom_id, type, node_name, res, as);
+    client.FindSimilar(atom_id, type_name, node_name, res, as);
 
     return res;
 }

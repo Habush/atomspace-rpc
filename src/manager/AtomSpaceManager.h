@@ -44,9 +44,9 @@ public:
 
     AtomSpacePtr getAtomspace(const std::string &id) const;
 
-    Handle findNode(Type type, const std::string &name, const std::string &id);
+    Handle findNode(const std::string& type_name, const std::string &name, const std::string &id);
 
-    void findSimilarNames(const std::string &id, Type type, const std::string &name,
+    void findSimilarNames(const std::string &id, const std::string& type_name, const std::string &name,
                           HandleSeq &result);
 
 private:

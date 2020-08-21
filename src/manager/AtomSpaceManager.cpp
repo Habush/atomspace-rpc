@@ -137,19 +137,21 @@ void AtomSpaceManager::loadFromSettings(const std::string &fname) {
 
 }
 
-Handle AtomSpaceManager::findNode(Type type, const std::string &name, const std::string& id) {
+Handle AtomSpaceManager::findNode(const std::string& type_name, const std::string &name, const std::string& id) {
      AtomSpacePtr as = getAtomspace(id);
      if(as == nullptr){
          throw std::runtime_error("Atomspace with id " + id + " not found!");
      }
+     Type type = nameserver().getType(type_name);
+     if(type == NOTYPE) return Handle::UNDEFINED;
      Handle h = createNode(type, name);
      return as->get_atom(h);
 }
 
-void AtomSpaceManager::findSimilarNames(const std::string &id, Type type, const std::string &name,
+void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string& type_name, const std::string &name,
                       HandleSeq &result) {
-
-    if (!namer.isNode(type)) return;
+    Type type = namer.getType(type_name);
+    if(type == NOTYPE || !namer.isNode(type)) return;
 
     AtomSpacePtr as = getAtomspace(id);
     if(as == nullptr){
