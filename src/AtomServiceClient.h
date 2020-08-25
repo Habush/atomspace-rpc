@@ -52,8 +52,8 @@ public:
      * @param as - the local atomspace to add the results to
      * @param result - a handle vector that will contain the result of the pattern matcher query
      */
-    void ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace* as, HandleSeq&
-    result);
+    void ExecutePattern(const std::string &atom_id, const std::string &key, const Handle &patt,
+                        AtomSpace *as, HandleSeq &result);
 
     /**
      * Checks if a node exists on a remote atomspace

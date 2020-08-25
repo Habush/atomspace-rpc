@@ -2,7 +2,8 @@ syntax = "proto3";
 
 message PatternMsg {
   string atomspace = 1;
-  string query = 2;
+  string key = 2;
+  string query = 3;
 }
 
 message NodeMsg {

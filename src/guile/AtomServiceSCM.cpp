@@ -15,7 +15,7 @@ class AtomServiceSCM : public ModuleWrap {
 public:
     AtomServiceSCM(void);
 
-    HandleSeq ExecutePattern(const std::string &atom_id, const Handle &patt);
+    HandleSeq ExecutePattern(const std::string &atom_id, const std::string& key, const Handle &patt);
 
     bool CheckNode(const std::string &atom_id, const std::string &type_name, const std::string
     &node_name);
@@ -55,12 +55,12 @@ AtomServiceSCM::AtomServiceSCM(void)
     module_init();
 }
 
-HandleSeq AtomServiceSCM::ExecutePattern(const std::string &atom_id, const Handle &patt) {
+HandleSeq AtomServiceSCM::ExecutePattern(const std::string &atom_id, const std::string& key, const Handle &patt) {
     if(patt->is_executable()){
         HandleSeq res;
         AtomSpace* as = SchemeSmob::ss_get_env_as("exec-pattern");
         AtomServiceClient client(_channel);
-        client.ExecutePattern(atom_id, patt, as, res);
+        client.ExecutePattern(atom_id, key, patt, as, res);
         return res;
     }
      throw std::runtime_error(patt->to_short_string() + " is not an executable pattern");

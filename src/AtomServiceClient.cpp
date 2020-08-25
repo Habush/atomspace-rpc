@@ -4,13 +4,14 @@
 #include <opencog/atoms/atom_types/NameServer.h>
 #include "AtomServiceClient.h"
 
-void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace *as, HandleSeq &
-result) {
+void AtomServiceClient::ExecutePattern(const std::string &atom_id, const std::string &key, const Handle &patt,
+                                       AtomSpace *as, HandleSeq &result) {
 
     PatternMsg pattern;
     ClientContext context;
     AtomMsg atomMsg;
     pattern.set_atomspace(atom_id);
+    pattern.set_key(key);
     pattern.set_query(patt->to_string());
 
     std::unique_ptr<ClientReader<AtomMsg>> reader(_stub->ExecutePattern(&context, pattern));

@@ -39,7 +39,7 @@ public:
 
     Status ExecutePattern(ServerContext *context, const PatternMsg *patt, ServerWriter<AtomMsg> *writer) override {
         try {
-            Handle result = _atomManager.executePattern(patt->atomspace(), patt->query());
+            Handle result = _atomManager.executePattern(patt->atomspace(), patt->query(), patt->key());
 
             AtomMsg atomMsg;
 

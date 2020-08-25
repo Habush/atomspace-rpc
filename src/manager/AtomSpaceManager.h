@@ -35,7 +35,8 @@ public:
 
     bool removeAtomSpace(const std::string &id);
 
-    [[nodiscard]] Handle executePattern(const std::string &id, const std::string &pattern) const;
+    [[nodiscard]] Handle executePattern(const std::string &id, const std::string &pattern, const std::string &key)
+    const;
 
     //Load atomspaces from a settings json file
     void loadFromSettings(const std::string &fname);

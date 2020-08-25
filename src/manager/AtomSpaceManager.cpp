@@ -64,7 +64,8 @@ bool AtomSpaceManager::removeAtomSpace(const std::string &id) {
 }
 
 
-Handle AtomSpaceManager::executePattern(const std::string &id, const std::string &pattern) const {
+Handle AtomSpaceManager::executePattern(const std::string &id, const std::string &pattern, const std::string &key)
+const {
     auto res = _atomspaceMap.find(id);
     if (res == _atomspaceMap.end()) {
         throw std::runtime_error("An Atomspace with id " + id + " not found");
@@ -83,18 +84,23 @@ Handle AtomSpaceManager::executePattern(const std::string &id, const std::string
         throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
     }
 
-    Handle result;
+    Handle hkey = createNode(PREDICATE_NODE, key);
+    ValuePtr cachedRes = h->getValue(hkey);
+    if(cachedRes != nullptr) {
+        std::cout << "Found cached result for key: " << key << std::endl;
+        return HandleCast(cachedRes);
+    }
+
     if (h->is_executable()) {
 
         ValuePtr pattResult = h->execute(atomspace.get());
-        result = std::dynamic_pointer_cast<Atom>(pattResult);
-        return result;
+        h->setValue(hkey, pattResult);
+        return HandleCast(pattResult);
 
     } // not a pattern matching query
     atomspace->remove_atom(h, true);
     throw std::runtime_error("Only send pattern matching query to execute patterns. " + pattern + " is not a "
-                                                                                                     "pattern matching query");
-
+                                                                                                  "pattern matching query");
 }
 
 std::vector<std::string> AtomSpaceManager::getAtomspaces() const {
