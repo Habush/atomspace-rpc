@@ -1,6 +1,6 @@
 [
   {
     "id": "asp1",
-    "scmFile": "../sample.scm"
+    "scmFile": "tests/sample.scm"
   }
 ]

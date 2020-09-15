@@ -78,6 +78,14 @@ public:
     void FindSimilar(const std::string &atom_id, const std::string &type_name, const std::string
     &node_name, HandleSeq& result, AtomSpace* as);
 
+    /**
+     * Return all the handles with a specific name in atomspace atom_id
+     * @param atom_id - the id of the remote atomspace
+     * @param name - he name of the node
+     * @param result - NodeMsg representing the handle
+     */
+    NodeMsg FindType(const std::string &atom_id, const std::string &name);
+
 private:
     Handle FromNodeMsg(const NodeMsg& node);
     Handle FromLinkMsg(const LinkMsg& link);

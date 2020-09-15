@@ -79,6 +79,22 @@ void AtomServiceClient::FindSimilar(const std::string &atom_id, const std::strin
     }
 }
 
+NodeMsg AtomServiceClient::FindType(const std::string &atom_id, const std::string &name) {
+    ClientContext context;
+    PatternMsg msg;
+    NodeMsg nodeMsg;
+
+    msg.set_atomspace(atom_id);
+    msg.set_query(name);
+
+    Status status = _stub->FindType(&context, msg, &nodeMsg);
+    if(!status.ok()){
+        throw std::runtime_error("FindType rpc failed. Reason: " + status.error_message());
+    }
+
+    return nodeMsg;
+}
+
 Handle AtomServiceClient::FromNodeMsg(const NodeMsg &node) {
     Type type = nameserver().getType(node.type());
     return createNode(type, std::move(node.name()));

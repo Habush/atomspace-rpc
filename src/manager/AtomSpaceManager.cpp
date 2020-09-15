@@ -15,8 +15,6 @@
 #include "AtomSpaceManager.h"
 #include "Timer.h"
 
-static NameServer& namer = nameserver();
-
 AtomSpacePtr AtomSpaceManager::loadAtomSpace(const std::string &fname, const std::string &id) {
     //Check if the id exists
     auto res = _atomspaceMap.find(id);
@@ -27,7 +25,6 @@ AtomSpacePtr AtomSpaceManager::loadAtomSpace(const std::string &fname, const std
     AtomSpacePtr atomspace = std::make_shared<AtomSpace>();
 
     load_file(fname, *atomspace);
-
     return atomspace;
 
 }
@@ -48,53 +45,6 @@ AtomSpacePtr AtomSpaceManager::loadDirectory(const std::string &dirname, const s
     }
 
     return atomspace;
-}
-
-
-bool AtomSpaceManager::removeAtomSpace(const std::string &id) {
-    auto res = _atomspaceMap.find(id);
-    if (res == _atomspaceMap.end()) {
-        return false;
-    }
-
-    _atomspaceMap.erase(id);
-    _atomIds.erase(std::remove(_atomIds.begin(), _atomIds.end(), id));
-    return true;
-
-}
-
-
-Handle AtomSpaceManager::executePattern(const std::string &id, const std::string &pattern) const {
-    auto res = _atomspaceMap.find(id);
-    if (res == _atomspaceMap.end()) {
-        throw std::runtime_error("An Atomspace with id " + id + " not found");
-    }
-
-    Handle h;
-    AtomSpacePtr atomspace = res->second;
-
-    try {
-        h = opencog::parseExpression(pattern, *atomspace);
-    } catch (std::runtime_error &err) {
-        throw err;
-    }
-
-    if (h == nullptr) {
-        throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
-    }
-
-    Handle result;
-    if (h->is_executable()) {
-
-        ValuePtr pattResult = h->execute(atomspace.get());
-        result = std::dynamic_pointer_cast<Atom>(pattResult);
-        return result;
-
-    } // not a pattern matching query
-    atomspace->remove_atom(h, true);
-    throw std::runtime_error("Only send pattern matching query to execute patterns. " + pattern + " is not a "
-                                                                                                     "pattern matching query");
-
 }
 
 std::vector<std::string> AtomSpaceManager::getAtomspaces() const {
@@ -135,6 +85,34 @@ void AtomSpaceManager::loadFromSettings(const std::string &fname) {
 
     std::cout << "Took " << timer.elapsed() << " seconds load Atomspaces" << std::endl;
 
+}
+
+bool AtomSpaceManager::removeAtomSpace(const std::string &id) {
+    auto res = _atomspaceMap.find(id);
+    if (res == _atomspaceMap.end()) {
+        return false;
+    }
+
+    _atomspaceMap.erase(id);
+    _atomIds.erase(std::remove(_atomIds.begin(), _atomIds.end(), id));
+    return true;
+
+
+}
+
+Handle AtomSpaceManager::findType(const std::string &id, const std::string &name) {
+    HandleSeq res;
+    AtomSpacePtr atomSpacePtr = _atomspaceMap.at(id);
+    std::string type_name;
+    for(Type type: _types){
+        type_name = namer.getTypeName(type);
+        Handle h = atomSpacePtr->get_handle(type, name);
+        if(h != Handle::UNDEFINED){
+            return h;
+        }
+    }
+
+    return Handle::UNDEFINED;
 }
 
 Handle AtomSpaceManager::findNode(const std::string& type_name, const std::string &name, const std::string& id) {
@@ -180,4 +158,36 @@ void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string
 //    std::transform(atoms.begin(), atoms.end(), result.begin(), [](const opencog::Handle& h) {
 //        return h->get_name();
 //    });
+}
+
+Handle AtomSpaceManager::executePattern(const std::string &id, const std::string &pattern) const {
+    auto res = _atomspaceMap.find(id);
+    if (res == _atomspaceMap.end()) {
+        throw std::runtime_error("An Atomspace with id " + id + " not found");
+    }
+
+    Handle h;
+    AtomSpacePtr atomspace = res->second;
+
+    try {
+        h = opencog::parseExpression(pattern, *atomspace);
+    } catch (std::runtime_error &err) {
+        throw err;
+    }
+
+    if (h == nullptr) {
+        throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
+    }
+
+    Handle result;
+    if (h->is_executable()) {
+
+        ValuePtr pattResult = h->execute(atomspace.get());
+        result = std::dynamic_pointer_cast<Atom>(pattResult);
+        return result;
+
+    } // not a pattern matching query
+    atomspace->remove_atom(h, true);
+    throw std::runtime_error("Only send pattern matching query to execute patterns. " + pattern + " is not a "
+                                                                                                  "pattern matching query");
 }

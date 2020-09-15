@@ -1,11 +1,10 @@
-
-
 #include <nlohmann/json.hpp>
 #include "../../src/manager/AtomSpaceManager.h"
 #include <cxxtest/TestSuite.h>
 #include <string_view>
 
 using json = nlohmann::json;
+
 
 class AtomSpaceManagerUTest : public CxxTest::TestSuite
 {
@@ -15,6 +14,7 @@ private:
 public:
     AtomSpaceManagerUTest() {
         logger().set_print_to_stdout_flag(true);
+        _atomSpaceManager.loadFromSettings("tests/manager/settings.json");
     }
 
     void setUp() {}
@@ -24,14 +24,14 @@ public:
     void test_loadFromSettings();
 
     void test_execute_pattern();
+
+    void test_find_type();
 };
 
 void AtomSpaceManagerUTest::test_loadFromSettings()
 {
 
     logger().info("BEGIN TEST: %s", __FUNCTION__);
-
-    _atomSpaceManager.loadFromSettings("../tests/manager/settings.json");
 
     //Verify the atomspaces are loaded properly
     TS_ASSERT_EQUALS("asp1", _atomSpaceManager.getAtomspaces()[0])
@@ -44,7 +44,7 @@ void AtomSpaceManagerUTest::test_execute_pattern()
 {
     logger().info("BEGIN TEST: %s", __FUNCTION__);
 
-    std::string patt = "(MeetLink\n"
+    std::string patt = "(Get\n"
                             "   (EvaluationLink (Predicate \"is_part\")\n"
                             "    (List\n"
                             "      (Concept \"A\")\n"
@@ -56,5 +56,13 @@ void AtomSpaceManagerUTest::test_execute_pattern()
 
     TS_ASSERT_EQUALS(result->getOutgoingSet().size(), 3)
 
+    logger().info("END TEST: %s", __FUNCTION__);
+}
+
+void AtomSpaceManagerUTest::test_find_type() {
+    logger().info("BEGIN TEST: %s", __FUNCTION__);
+
+    Handle result = _atomSpaceManager.findType("asp1", "IGF1");
+    TS_ASSERT(result != Handle::UNDEFINED);
     logger().info("END TEST: %s", __FUNCTION__);
 }

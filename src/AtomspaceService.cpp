@@ -97,10 +97,27 @@ public:
         return Status::OK;
     }
 
+    Status FindType(ServerContext* context, const PatternMsg* request, NodeMsg *nodeMsg) override{
+        try {
+            Handle h = _atomManager.findType(request->atomspace(), request->query());
+             nodeMsg->CopyFrom(buildNodeMsg(h));
+        } catch(std::runtime_error& err) {
+            std::cout << "Error: " << err.what() << std::endl;
+            return Status(StatusCode::CANCELLED, err.what());
+        }
+
+        return Status::OK;
+    }
+
 private:
 
     NodeMsg buildNodeMsg(const Handle &h) {
         NodeMsg nodeMsg;
+        if(h == Handle::UNDEFINED){
+            nodeMsg.set_type("undefined");
+            nodeMsg.set_name("");
+            return nodeMsg;
+        }
         nodeMsg.set_type(nameserver().getTypeName(h->get_type()));
         nodeMsg.set_name(h->get_name());
         return nodeMsg;
@@ -123,6 +140,7 @@ private:
     }
 
     AtomSpaceManager _atomManager;
+    std::mutex _mu;
 };
 
 void RunServer(const std::string &fname, const std::string &addr) {

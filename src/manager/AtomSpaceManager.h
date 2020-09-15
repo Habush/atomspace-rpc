@@ -20,11 +20,16 @@ using json = nlohmann::json;
 typedef std::shared_ptr<AtomSpace> AtomSpacePtr;
 
 typedef std::map<std::string, AtomSpacePtr> AtomSpaceMap;
+typedef std::vector<Type> TypeList;
+static NameServer& namer = nameserver();
 
 class AtomSpaceManager {
 
 public:
-    AtomSpaceManager() {};
+    AtomSpaceManager() {
+        namer.getChildrenRecursive(CONCEPT_NODE, std::back_inserter(_types));
+        _types.push_back(CONCEPT_NODE);
+    }
 
     ~AtomSpaceManager() = default;
 
@@ -46,13 +51,16 @@ public:
 
     Handle findNode(const std::string& type_name, const std::string &name, const std::string &id);
 
+    //Given a name, return atoms with that name
+    Handle findType(const std::string& id, const std::string &name);
+
     void findSimilarNames(const std::string &id, const std::string& type_name, const std::string &name,
                           HandleSeq &result);
 
 private:
     AtomSpaceMap _atomspaceMap;
     std::vector<std::string> _atomIds;
-
+    TypeList _types;
 };
 
 

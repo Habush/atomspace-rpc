@@ -38,4 +38,7 @@ service AtomServer {
 
   //Find nodes with similar names to a given node. Currently it uses a simple regex and limits the result to 10
   rpc FindSimilar(AtomRequest) returns (stream NodeMsg);
+
+  //Given an atom name, return the atom type if it exists
+  rpc FindType(PatternMsg) returns (NodeMsg);
 }
