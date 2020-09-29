@@ -17,8 +17,8 @@ class AtomServiceSCM;
 //Note: I had to add this custom class because using SchemePrimitive<SCM, C, Args...> call to member function 'scm_from' is ambiguous
 //with candidate functions SCM scm_from(SCM scm) const and SCM scm_from(bool b) const
 template<typename C, class... Args>
-class CustomSchemePrimitive: public SchemePrimitiveBase<SCM, C, Args...> {
-    typedef SchemePrimitiveBase<SCM, C, Args...> super;
+class CustomSchemePrimitive: public SchemeMethodBase<SCM, C, Args...> {
+    typedef SchemeMethodBase<SCM, C, Args...> super;
 public:
     CustomSchemePrimitive(const char* module, const char* name,
                           SCM(C::*cb)(Args...), C *data): super(module, name, cb, data){}
