@@ -21,7 +21,7 @@ class CustomSchemePrimitive: public SchemeMethodBase<SCM, C, Args...> {
     typedef SchemeMethodBase<SCM, C, Args...> super;
 public:
     CustomSchemePrimitive(const char* module, const char* name,
-                          SCM(C::*cb)(Args...), C *data): super(module, name, cb, data){}
+                          SCM(C::*cb)(Args...), C *data): super(module, name, cb, data, true){}
 
 protected:
     // Convert any type to SCM
