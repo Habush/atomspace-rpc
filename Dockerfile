@@ -1,49 +1,71 @@
 FROM ubuntu:20.04
-MAINTAINER Abdulrahman Semrie<hsamireh@gmail.com>
+MAINTAINER Abdulrahman Semrie <xabush@singularitynet.io>
 
 #Run apt-get in NONINTERACTIVE mode
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND noninteractive 
 
 RUN apt-get update
 
-RUN apt-get install -y git libboost-all-dev cython dh-autoreconf unzip gdb vim wget curl libssl-dev 
+RUN apt-get install -y git ssh libssl-dev libboost-all-dev cython dh-autoreconf unzip gdb vim
 
-#Install Guile dependecies
-RUN apt-get install -y libgmp-dev libltdl-dev libunistring-dev libffi-dev libgc-dev flex texinfo  libreadline-dev pkg-config
-
-##Install latest cmake
+##Install latest cmake - grpc complains for old cmake versions
 RUN cd /tmp && wget -O cmake.sh https://github.com/Kitware/CMake/releases/download/v3.18.1/cmake-3.18.1-Linux-x86_64.sh && \
     sh ./cmake.sh --prefix=/usr/local --skip-license
 
 RUN cmake --version
 
-#Install guile-3.x
-RUN cd /tmp && wget https://ftp.gnu.org/gnu/guile/guile-3.0.2.tar.gz  && \
-         tar -xvzf guile-3.0.2.tar.gz && cd guile-3.0.2 && \
+#Install Guile dependecies
+RUN apt-get install -y libgmp-dev libltdl-dev libunistring-dev libffi-dev libgc-dev flex texinfo  libreadline-dev pkg-config
+
+ENV HOME /root
+
+ENV GUILE_VERSION 3.0.9
+RUN cd /tmp && wget https://ftp.gnu.org/gnu/guile/guile-$GUILE_VERSION.tar.gz  && \
+         tar -xvzf guile-$GUILE_VERSION.tar.gz && cd guile-$GUILE_VERSION && \
          autoreconf -vif && \
          ./configure && \
          make -j4 && make install
 
-RUN cd /tmp && git clone https://github.com/opencog/cogutil.git && \
+
+##Install grpc cpp
+#prev version -b v1.31.0
+ENV GRPC_VERSION 1.56.0
+RUN cd /tmp &&  git clone -b v$GRPC_VERSION https://github.com/grpc/grpc && \
+    cd grpc && git submodule update --init && \
+    mkdir build && cd build && \
+    cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF \
+    -DgRPC_ZLIB_PROVIDER=package \
+    -DgRPC_SSL_PROVIDER=package -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j8 && \
+    make install && \
+    ldconfig
+
+RUN cd /tmp && git clone https://github.com/singnet/cogutil.git && \
     cd cogutil && \
     mkdir build && \
     cd build && \
     cmake .. && \
-    make -j4 && \
+    make -j8 && \
     make install && \
-    ldconfig /usr/local/lib/opencog
+    ldconfig /usr/local/lib/opencog && \
+    make clean && \
+    cd ../.. && \
+    rm -r cogutil
 
 #Install atomspace
-RUN cd /tmp && git clone https://github.com/opencog/atomspace.git && \
+RUN cd /tmp && git clone https://github.com/singnet/atomspace.git && \
     cd atomspace && \
     mkdir build && \
     cd build && \
     cmake .. && \
-    make -j4 && \
+    make -j8 && \
     make install && \
-    ldconfig /usr/local/lib/opencog
+    ldconfig /usr/local/lib/opencog && \
+    make clean && \
+    cd ../.. && \
+    rm -r atomspace
 
 #Install agi-bio
 RUN cd /tmp && git clone https://github.com/opencog/agi-bio.git && \
@@ -51,28 +73,37 @@ RUN cd /tmp && git clone https://github.com/opencog/agi-bio.git && \
     mkdir build && \
     cd build && \
     cmake .. && \
-    make -j4 && \
+    make -j8 && \
     make install && \
-    ldconfig /usr/local/lib/opencog
+    ldconfig /usr/local/lib/opencog && \
+    make clean && \
+    cd ../.. && \
+    rm -r agi-bio
 
-
-##Install grpc cpp
-RUN cd /tmp &&  git clone -b v1.31.0 https://github.com/grpc/grpc && \
-    cd grpc && git submodule update --init && \
-    mkdir build && cd build && \
-    cmake .. && make && make install && \
-    ldconfig
+RUN cd /tmp && git clone https://github.com/aconchillo/guile-json && \
+    cd guile-json && \
+    autoreconf -vif && \
+    ./configure  && \
+    make && \
+    make install
 
 ##Install nlohmann json
 RUN mkdir -p /usr/local/include/nlohmann && wget -O /usr/local/include/nlohmann/json.hpp https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp
+WORKDIR $HOME
 
-##Build atomspace-rpc
-COPY . /opt/atomspace-rpc
-WORKDIR /opt/atomspace-rpc
+ENV CODE $HOME/atomspace-rpc
+RUN mkdir $CODE
 
-RUN mkdir build && cd build && \
-    cmake .. && make -j2 && make install && \
-    ldconfig
+WORKDIR $CODE
 
-WORKDIR /opt/atomspace-rpc
-ENTRYPOINT ["/usr/local/bin/atom_server --config /opt/settings.json --host 0.0.0.0"]
+COPY . $CODE
+
+RUN cd $CODE && mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Debug .. && \
+    make -j && \
+    make install && ldconfig
+
+WORKDIR $CODE
+#RUN ls $CODE
+CMD ["atom_server", "--config", "./config.json", "--port", "8005"]
+

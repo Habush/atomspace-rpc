@@ -1,7 +1,10 @@
 //
 // Created by Abdulrahman Semrie on 6/25/20.
 //
+#include <opencog/atoms/value/Value.h>
+#include <opencog/atomspace/AtomSpace.h>
 #include <opencog/atoms/atom_types/NameServer.h>
+#include <opencog/persist/sexpr/Sexpr.h>
 #include "AtomServiceClient.h"
 
 void AtomServiceClient::ExecutePattern(const std::string &atom_id, const Handle &patt, AtomSpace *as, HandleSeq &
@@ -11,8 +14,7 @@ result) {
     ClientContext context;
     AtomMsg atomMsg;
     pattern.set_atomspace(atom_id);
-    pattern.set_query(patt->to_string());
-
+    pattern.set_query(opencog::Sexpr::encode_atom(patt));
     std::unique_ptr<ClientReader<AtomMsg>> reader(_stub->ExecutePattern(&context, pattern));
 
 
