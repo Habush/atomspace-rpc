@@ -36,6 +36,10 @@ This project depends on the following libraries:
  - [Protobuff](https://github.com/protocolbuffers/protobuf)
  - [gRPC C++](https://github.com/grpc/grpc/tree/master/src/cpp)
     * See also here - https://grpc.io/docs/languages/cpp/quickstart/
+    * Note: While building gRPC from the source, make sure to have the following cmake options. For more info check out this [issue comment](https://github.com/grpc/grpc/issues/13841#issuecomment-355510534) from the library maintainers.
+        
+
+        cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF -DgRPC_PROTOBUF_PROVIDER=package -DgRPC_ZLIB_PROVIDER=package -DgRPC_CARES_PROVIDER=package -DgRPC_SSL_PROVIDER=package -DCMAKE_BUILD_TYPE=Release ..
  - [nlohmann_json](https://github.com/nlohmann/json)
     * Since nlohmann json is a header only library just copy [json.hpp](https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp) to `/usr/local/include/nlohmann` directory. Create the nlohmann sub directory if it doesn't exist. Run the following command:
     
