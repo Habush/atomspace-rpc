@@ -31,6 +31,7 @@ RUN cd /tmp && wget https://ftp.gnu.org/gnu/guile/guile-$GUILE_VERSION.tar.gz  &
 
 ##Install grpc cpp
 #prev version -b v1.31.0
+ENV GRPC_DNS_RESOLVER native
 ENV GRPC_VERSION 1.56.0
 RUN cd /tmp &&  git clone -b v$GRPC_VERSION https://github.com/grpc/grpc && \
     cd grpc && git submodule update --init && \
