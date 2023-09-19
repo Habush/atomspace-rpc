@@ -11,6 +11,7 @@
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atoms/atom_types/NameServer.h>
 #include <opencog/persist/file/fast_load.h>
+#include <opencog/atoms/execution/Instantiator.h>
 
 #include "AtomSpaceManager.h"
 #include "Timer.h"
@@ -105,7 +106,7 @@ Handle AtomSpaceManager::findType(const std::string &id, const std::string &name
     AtomSpacePtr atomSpacePtr = _atomspaceMap.at(id);
     std::string type_name;
     for(Type type: _types){
-        type_name = namer.getTypeName(type);
+        type_name = AtomServiceUtils::namer.getTypeName(type);
         Handle h = atomSpacePtr->get_handle(type, name);
         if(h != Handle::UNDEFINED){
             return h;
@@ -128,8 +129,8 @@ Handle AtomSpaceManager::findNode(const std::string& type_name, const std::strin
 
 void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string& type_name, const std::string &name,
                       HandleSeq &result) {
-    Type type = namer.getType(type_name);
-    if(type == NOTYPE || !namer.isNode(type)) return;
+    Type type = AtomServiceUtils::namer.getType(type_name);
+    if(type == NOTYPE || !AtomServiceUtils::namer.isNode(type)) return;
 
     AtomSpacePtr as = getAtomspace(id);
     if(as == nullptr){
@@ -139,7 +140,7 @@ void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string
     std::regex similar_regex(patt, std::regex_constants::ECMAScript | std::regex_constants::icase);
 
     opencog::HandleSet atoms;
-    as->get_handleset_by_type(atoms, type);
+    as->get_handles_by_type(atoms, type);
 
     for(auto& h : atoms){
         if(result.size() == 10) break;
@@ -160,34 +161,36 @@ void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string
 //    });
 }
 
-Handle AtomSpaceManager::executePattern(const std::string &id, const std::string &pattern) const {
+Handle AtomSpaceManager::executePattern(const std::string &id, const Handle &pattern) const {
     auto res = _atomspaceMap.find(id);
     if (res == _atomspaceMap.end()) {
         throw std::runtime_error("An Atomspace with id " + id + " not found");
     }
 
-    Handle h;
+//    Handle h;
     AtomSpacePtr atomspace = res->second;
-
-    try {
-        h = opencog::parseExpression(pattern, *atomspace);
-    } catch (std::runtime_error &err) {
-        throw err;
-    }
-
-    if (h == nullptr) {
-        throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
-    }
+//
+//    try {
+//        h = opencog::parseExpression(pattern, *atomspace);
+//    } catch (std::runtime_error &err) {
+//        throw err;
+//    }
+//
+//    if (h == nullptr) {
+//        throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
+//    }
 
     Handle result;
-    if (h->is_executable()) {
+    if (pattern->is_executable()) {
 
-        ValuePtr pattResult = h->execute(atomspace.get());
+//        ValuePtr pattResult = pattern->execute(atomspace.get());
+        Instantiator inst(atomspace.get());
+        ValuePtr pattResult(inst.execute(pattern));
         result = std::dynamic_pointer_cast<Atom>(pattResult);
         return result;
 
     } // not a pattern matching query
-    atomspace->remove_atom(h, true);
+    atomspace->remove_atom(pattern, true);
     throw std::runtime_error("Only send pattern matching query to execute patterns. " + pattern + " is not a "
                                                                                                   "pattern matching query");
 }

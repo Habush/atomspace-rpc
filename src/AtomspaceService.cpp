@@ -17,6 +17,7 @@
 #include <boost/program_options.hpp>
 
 #include "atom_server.grpc.pb.h"
+#include "AtomServiceUtils.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -39,16 +40,12 @@ public:
 
     Status ExecutePattern(ServerContext *context, const PatternMsg *patt, ServerWriter<AtomMsg> *writer) override {
         try {
-            Handle result = _atomManager.executePattern(patt->atomspace(), patt->query());
+            Handle result = _atomManager.executePattern(patt->atomspace(), AtomServiceUtils::FromLinkMsg(patt->query()));
 
             AtomMsg atomMsg;
 
             for (auto &h : result->getOutgoingSet()) {
-                if(h->is_node()){
-                    atomMsg.mutable_node()->CopyFrom(buildNodeMsg(h));
-                } else if (h->is_link()) {
-                    atomMsg.mutable_link()->CopyFrom(buildLinkMsg(h));
-                }
+                atomMsg = AtomServiceUtils::ToAtomMsg(h);
                 writer->Write(atomMsg);
             }
 
@@ -61,15 +58,12 @@ public:
 
     Status CheckNode(ServerContext *context, const AtomRequest *req, NodeMsg *res) override {
         try {
-            if(!req->atom().has_node()){
-                throw std::runtime_error("Expecting a Node message");
-            }
-            Handle h = _atomManager.findNode(req->atom().node().type(), req->atom().node().name(), req->atomspace());
+            Handle h = _atomManager.findNode(req->atom().type(), req->atom().name(), req->atomspace());
             if(h == Handle::UNDEFINED){
                 return Status(grpc::StatusCode::NOT_FOUND, "Node not found");
             }
 
-            res->CopyFrom(buildNodeMsg(h));
+            res->CopyFrom(AtomServiceUtils::ToNodeMsg(h));
             return Status::OK;
         } catch(std::runtime_error& err) {
             std::cout << "Error: " << err.what() << std::endl;
@@ -78,29 +72,21 @@ public:
     }
 
     Status FindSimilar(ServerContext *context, const AtomRequest *req, ServerWriter<NodeMsg> *writer) override {
-        try {
-            if(!req->atom().has_node()){
-                throw std::runtime_error("Expecting a Node message");
-            }
-        } catch(std::runtime_error& err) {
-            std::cout << "Error: " << err.what() << std::endl;
-            return Status(StatusCode::CANCELLED, err.what());
-        }
 
         HandleSeq result;
-        _atomManager.findSimilarNames(req->atomspace(), req->atom().node().type(), req->atom().node().name(), result);
+        _atomManager.findSimilarNames(req->atomspace(), req->atom().type(), req->atom().name(), result);
 
         for(auto &h : result) {
-            writer->Write(buildNodeMsg(h));
+            writer->Write(AtomServiceUtils::ToNodeMsg(h));
         }
 
         return Status::OK;
     }
 
-    Status FindType(ServerContext* context, const PatternMsg* request, NodeMsg *nodeMsg) override{
+    Status FindType(ServerContext* context, const AtomRequest *request, NodeMsg* res) override{
         try {
-            Handle h = _atomManager.findType(request->atomspace(), request->query());
-             nodeMsg->CopyFrom(buildNodeMsg(h));
+            Handle h = _atomManager.findType(request->atomspace(), request->atom().name());
+             res->CopyFrom(AtomServiceUtils::ToNodeMsg(h));
         } catch(std::runtime_error& err) {
             std::cout << "Error: " << err.what() << std::endl;
             return Status(StatusCode::CANCELLED, err.what());
@@ -110,34 +96,6 @@ public:
     }
 
 private:
-
-    NodeMsg buildNodeMsg(const Handle &h) {
-        NodeMsg nodeMsg;
-        if(h == Handle::UNDEFINED){
-            nodeMsg.set_type("undefined");
-            nodeMsg.set_name("");
-            return nodeMsg;
-        }
-        nodeMsg.set_type(nameserver().getTypeName(h->get_type()));
-        nodeMsg.set_name(h->get_name());
-        return nodeMsg;
-    }
-
-    LinkMsg buildLinkMsg(const Handle& h) {
-        LinkMsg linkMsg;
-        linkMsg.set_type(nameserver().getTypeName(h->get_type()));
-        for(auto& out : h->getOutgoingSet()){
-            AtomMsg msg;
-            if(out->is_node()){
-                msg.mutable_node()->CopyFrom(buildNodeMsg(out));
-
-            } else if(out->is_link()){
-                msg.mutable_link()->CopyFrom(buildLinkMsg(out));
-            }
-            linkMsg.mutable_outgoing()->Add(std::move(msg));
-        }
-        return linkMsg;
-    }
 
     AtomSpaceManager _atomManager;
     std::mutex _mu;

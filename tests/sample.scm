@@ -28,7 +28,7 @@
 
 (Evaluation (Predicate "expresses")
   (List
-    (Gene "IGF1")
-    (Molecule "P40123")
+    (Concept "IGF1")
+    (Concept "P40123")
   )
 )

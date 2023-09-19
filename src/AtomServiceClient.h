@@ -22,6 +22,7 @@
 #include <grpcpp/security/credentials.h>
 
 #include "atom_server.grpc.pb.h"
+#include "AtomServiceUtils.h"
 
 using namespace opencog;
 using grpc::Channel;
@@ -87,8 +88,6 @@ public:
     NodeMsg FindType(const std::string &atom_id, const std::string &name);
 
 private:
-    Handle FromNodeMsg(const NodeMsg& node);
-    Handle FromLinkMsg(const LinkMsg& link);
     std::unique_ptr<AtomServer::Stub> _stub;
 };
 

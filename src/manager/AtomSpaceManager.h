@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 #include <boost/filesystem.hpp>
+#include "../AtomServiceUtils.h"
 
 namespace fs = boost::filesystem;
 using namespace opencog;
@@ -21,13 +22,12 @@ typedef std::shared_ptr<AtomSpace> AtomSpacePtr;
 
 typedef std::map<std::string, AtomSpacePtr> AtomSpaceMap;
 typedef std::vector<Type> TypeList;
-static NameServer& namer = nameserver();
 
 class AtomSpaceManager {
 
 public:
     AtomSpaceManager() {
-        namer.getChildrenRecursive(CONCEPT_NODE, std::back_inserter(_types));
+        AtomServiceUtils::namer.getChildrenRecursive(CONCEPT_NODE, std::back_inserter(_types));
         _types.push_back(CONCEPT_NODE);
     }
 
@@ -40,7 +40,7 @@ public:
 
     bool removeAtomSpace(const std::string &id);
 
-    [[nodiscard]] Handle executePattern(const std::string &id, const std::string &pattern) const;
+    [[nodiscard]] Handle executePattern(const std::string &id, const Handle &pattern) const;
 
     //Load atomspaces from a settings json file
     void loadFromSettings(const std::string &fname);

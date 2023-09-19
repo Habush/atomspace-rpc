@@ -40,14 +40,17 @@ add_custom_command(
 #Generated include directory
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-set(SOURCES manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
+set(SOURCES manager/AtomSpaceManager.cpp AtomServiceUtils.cpp
+        ${atom_grpc_srcs} ${atom_proto_srcs})
 
 add_executable(atom_server AtomspaceService.cpp)
 target_sources(atom_server PRIVATE ${SOURCES})
 
 add_library(atom_service_client SHARED
         AtomServiceClient.cpp
-        manager/AtomSpaceManager.cpp ${atom_grpc_srcs} ${atom_proto_srcs})
+        manager/AtomSpaceManager.cpp
+        AtomServiceUtils.cpp
+        ${atom_grpc_srcs} ${atom_proto_srcs})
 
 # Set default include paths.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}

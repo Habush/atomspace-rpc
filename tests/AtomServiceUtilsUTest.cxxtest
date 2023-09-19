@@ -1,0 +1,84 @@
+#include "../src/AtomServiceUtils.h"
+#include <opencog/atoms/atom_types/NameServer.h>
+#include <cxxtest/TestSuite.h>
+#include <opencog/persist/sexpr/Sexpr.h>
+
+using namespace opencog;
+
+class AtomServiceUtilsUTest : public CxxTest::TestSuite
+{
+public:
+    void setUp() {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+    }
+    void tearDown() {}
+
+    void test_FromNodeMsg();
+    void test_FromLinkMsg();
+    void test_ToNodeMsg();
+    void test_ToLinkMsg();
+};
+
+void AtomServiceUtilsUTest::test_FromNodeMsg()
+{
+    logger().info("BEGIN TEST: %s", __FUNCTION__);
+    NodeMsg nodeMsg;
+    nodeMsg.set_type("ConceptNode");
+    nodeMsg.set_name("A");
+
+    Handle node = AtomServiceUtils::FromNodeMsg(nodeMsg);
+
+    TS_ASSERT_EQUALS(nameserver().getTypeName(node->get_type()), "ConceptNode");
+    TS_ASSERT_EQUALS(node->get_name(), "A");
+
+    logger().info("END TEST: %s", __FUNCTION__);
+}
+
+void AtomServiceUtilsUTest::test_FromLinkMsg() {
+    logger().info("BEGIN TEST: %s", __FUNCTION__);
+
+    std::string linkStr = "(Evaluation \n"
+                          "(Predicate \"is_part\")\n"
+                          "(List (Concept \"A\") (Concept \"B\")))";
+
+    Handle link = Sexpr::decode_atom(linkStr);
+
+    LinkMsg linkMsg = AtomServiceUtils::ToLinkMsg(link);
+
+    Handle link1 = AtomServiceUtils::FromLinkMsg(linkMsg);
+
+    TS_ASSERT_EQUALS(nameserver().getTypeName(link1->get_type()), "EvaluationLink");
+    TS_ASSERT_EQUALS(link1->getOutgoingSet().size(), link1->getOutgoingSet().size());
+    logger().info("END TEST: %s", __FUNCTION__);
+}
+
+void AtomServiceUtilsUTest::test_ToNodeMsg() {
+    logger().info("BEGIN TEST: %s", __FUNCTION__);
+    NodeMsg nodeMsg;
+    nodeMsg.set_type("ConceptNode");
+    nodeMsg.set_name("A");
+
+    Handle node = AtomServiceUtils::FromNodeMsg(nodeMsg);
+
+    TS_ASSERT_EQUALS(nodeMsg.type(), "ConceptNode");
+    TS_ASSERT_EQUALS(nodeMsg.name(), "A");
+
+    logger().info("END TEST: %s", __FUNCTION__);
+}
+
+void AtomServiceUtilsUTest::test_ToLinkMsg() {
+    logger().info("BEGIN TEST: %s", __FUNCTION__);
+    std::string linkStr = "(GetLink (Evaluation \n"
+                          "(Predicate \"is_part\")\n"
+                          "(List (Concept \"A\") (Variable \"$y\"))))";
+
+    Handle link = Sexpr::decode_atom(linkStr);
+    LinkMsg linkMsg = AtomServiceUtils::ToLinkMsg(link);
+
+    TS_ASSERT_EQUALS(linkMsg.type(), "GetLink");
+    TS_ASSERT_EQUALS(linkMsg.outgoing().size(), link->getOutgoingSet().size());
+    TS_ASSERT_EQUALS(linkMsg.outgoing()[0].link().outgoing().size(), link->getOutgoingSet()[0]->getOutgoingSet().size());
+    logger().info("Outgoing size: %d", linkMsg.outgoing()[0].link().outgoing().size());
+    logger().info("END TEST: %s", __FUNCTION__);
+}

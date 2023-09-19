@@ -1,3 +1,1 @@
-link_libraries(atomspace atom_service_client)
-
 ADD_CXXTEST(AtomSpaceManagerUTest)
