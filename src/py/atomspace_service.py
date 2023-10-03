@@ -1,12 +1,10 @@
 # Author Abdulrahman S. Omar <xabush@singularitynet.io>
 import grpc
 import re
-from atom_server_pb2_grpc import AtomServerServicer
-from atom_server_pb2 import NodeMsg, LinkMsg, AtomMsg
-from das.distributed_atom_space import DistributedAtomSpace, QueryOutputFormat
-from das.pattern_matcher.pattern_matcher import PatternMatchingAnswer, OrderedAssignment, UnorderedAssignment, \
-                                                 CompositeAssignment, Node, Link, Variable, Not, And, Or, LogicalExpression
-from atomservice_utils import *
+from py.atom_server_pb2_grpc import AtomServerServicer
+from das.pattern_matcher.pattern_matcher import PatternMatchingAnswer, UnorderedAssignment, \
+                                                 CompositeAssignment, Link, Variable, Not, Or, LogicalExpression
+from py.atomservice_utils import *
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -17,7 +15,6 @@ class AtomSpaceService(AtomServerServicer):
     def __init__(self, das):
         self.das = das
         self.db = self.das.db
-        self.db.prefetch()
 
     def ExecutePattern(self, request, context):
         exec_link = link_msg_to_link(request.query)

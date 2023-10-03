@@ -1,6 +1,6 @@
 # Author Abdulrahman S. Omar <xabush@singularitynet.io>
 
-from atom_server_pb2 import NodeMsg, LinkMsg, AtomMsg
+from py.atom_server_pb2 import NodeMsg, LinkMsg, AtomMsg
 from das.pattern_matcher.pattern_matcher import PatternMatchingAnswer, OrderedAssignment, UnorderedAssignment, CompositeAssignment, Node, Link, Variable, Not, And, Or
 def node_msg_to_node(node_msg):
     #check if the type name contains the 'Node' suffix as das doesn't support it

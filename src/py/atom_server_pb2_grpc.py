@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import atom_server_pb2 as atom__server__pb2
+import py.atom_server_pb2 as atom__server__pb2
 
 
 class AtomServerStub(object):
