@@ -139,7 +139,7 @@ void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string
     std::string patt = name + ".+$";
     std::regex similar_regex(patt, std::regex_constants::ECMAScript | std::regex_constants::icase);
 
-    opencog::HandleSet atoms;
+    opencog::HandleSeq atoms;
     as->get_handles_by_type(atoms, type);
 
     for(auto& h : atoms){
@@ -161,36 +161,26 @@ void AtomSpaceManager::findSimilarNames(const std::string &id, const std::string
 //    });
 }
 
-Handle AtomSpaceManager::executePattern(const std::string &id, const Handle &pattern) const {
+Handle AtomSpaceManager::executePattern(const std::string &id, const Handle& pattern) const {
     auto res = _atomspaceMap.find(id);
     if (res == _atomspaceMap.end()) {
         throw std::runtime_error("An Atomspace with id " + id + " not found");
     }
-
-//    Handle h;
     AtomSpacePtr atomspace = res->second;
-//
-//    try {
-//        h = opencog::parseExpression(pattern, *atomspace);
-//    } catch (std::runtime_error &err) {
-//        throw err;
-//    }
-//
-//    if (h == nullptr) {
-//        throw std::runtime_error("Invalid Pattern Matcher query: " + pattern);
-//    }
+
+    Handle h = atomspace->add_atom(pattern);
 
     Handle result;
-    if (pattern->is_executable()) {
+    if (h->is_executable()) {
 
 //        ValuePtr pattResult = pattern->execute(atomspace.get());
         Instantiator inst(atomspace.get());
-        ValuePtr pattResult(inst.execute(pattern));
+        ValuePtr pattResult(inst.execute(h));
         result = std::dynamic_pointer_cast<Atom>(pattResult);
         return result;
 
     } // not a pattern matching query
-    atomspace->remove_atom(pattern, true);
-    throw std::runtime_error("Only send pattern matching query to execute patterns. " + pattern + " is not a "
+    atomspace->remove_atom(h, true);
+    throw std::runtime_error("Only send pattern matching query to execute patterns. " + h + " is not a "
                                                                                                   "pattern matching query");
 }

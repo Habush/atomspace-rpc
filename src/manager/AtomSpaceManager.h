@@ -40,7 +40,7 @@ public:
 
     bool removeAtomSpace(const std::string &id);
 
-    [[nodiscard]] Handle executePattern(const std::string &id, const Handle &pattern) const;
+    [[nodiscard]] Handle executePattern(const std::string &id, const Handle& pattern) const;
 
     //Load atomspaces from a settings json file
     void loadFromSettings(const std::string &fname);
