@@ -25,7 +25,31 @@ $ atom_server --config /path/to/setting.json
 
 By default the server runs at `localhost:50051` . But you can that using the `--host` and `--port` arguments.
 
-### Building and Installation.
+## Building and Installation.
+
+### A. Docker based Setup (Recommended) 
+
+
+1. Create a file named `config.json` inside the root directory that contains where the atomese data to be loaded is contained. A sample file looks like the following.
+
+```
+    {
+      "id": "prod-atom",
+      "pathDir": "/data"
+    }
+```
+2. Build the docker image by running
+
+```
+  docker build -t atom_server .
+```
+
+3. Start the server. By default the server starts on port 8005. If you want to use another port change the `--network host` option to `-p <port-you-want-to-use>:8005`
+
+```
+    docker run --network host -v <path/to/atomese/files>:/data atom_server
+```
+### B. Local Setup
 
 #### 1. Requirements:
 
